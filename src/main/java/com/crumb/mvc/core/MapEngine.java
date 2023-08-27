@@ -44,7 +44,7 @@ public class MapEngine {
 
         else {
             var paramObjArr = method.getParameters();
-            var paramArr = Arrays.stream(paramObjArr).map(p -> injectParam(p, req, url)).toArray();
+            var paramArr = Arrays.stream(paramObjArr).map(p -> injectParam(p, req, resp, url)).toArray();
             boolean hasNull = Arrays.stream(paramArr).anyMatch(Objects::isNull);
             if (hasNull) return false;
             var result = ReflectUtil.invokeMethod(method, target, paramArr);
@@ -55,7 +55,7 @@ public class MapEngine {
 
     }
 
-    private static Object injectParam(Parameter param, HttpServletRequest req, EnhancedUrl url) {
+    private static Object injectParam(Parameter param, HttpServletRequest req, HttpServletResponse resp, EnhancedUrl url) {
         if (param.isAnnotationPresent(RequestParam.class)) {
             var anno = param.getAnnotation(RequestParam.class);
             var name = anno.value();
@@ -94,6 +94,10 @@ public class MapEngine {
 
         if (param.getType() == HttpServletRequest.class) {
             return req;
+        }
+
+        if (param.getType() == HttpServletResponse.class) {
+            return resp;
         }
 
         return null;
