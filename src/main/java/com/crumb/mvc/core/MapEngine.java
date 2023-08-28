@@ -92,8 +92,7 @@ public class MapEngine {
 
         if (param.isAnnotationPresent(RequestHeader.class)) {
             var name = param.getAnnotation(RequestHeader.class).value();
-            var header = req.getHeader(name);
-            return header;
+            return req.getHeader(name);
         }
 
         if (param.getType() == HttpSession.class) {
