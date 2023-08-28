@@ -68,6 +68,10 @@ public class MapEngine {
         if (param.isAnnotationPresent(CookieValue.class)) {
             var anno = param.getAnnotation(CookieValue.class);
             var name = anno.value();
+            if (req.getCookies() == null) {
+                return anno.required() ? null : anno.defaultValue();
+            }
+
             var cookie = Arrays.stream(req.getCookies())
                     .filter(c -> c.getName().equals(name)).findFirst().orElse(null);
             if (cookie == null) {
