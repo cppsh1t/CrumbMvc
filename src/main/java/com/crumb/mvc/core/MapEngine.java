@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.crumb.definition.BeanDefinition;
 import com.crumb.mvc.util.StringUtil;
 import com.crumb.util.ReflectUtil;
-import com.crumb.web.CookieValue;
-import com.crumb.web.PathVariable;
-import com.crumb.web.RequestParam;
-import com.crumb.web.SessionAttribute;
+import com.crumb.web.*;
 import com.crumb.mvc.util.ServletUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.http.HttpHeaders;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -90,6 +88,12 @@ public class MapEngine {
             var name = param.getAnnotation(PathVariable.class).value();
             var pathMap = url.getPathVarMap();
             return pathMap.get(name);
+        }
+
+        if (param.isAnnotationPresent(RequestHeader.class)) {
+            var name = param.getAnnotation(RequestHeader.class).value();
+            var header = req.getHeader(name);
+            return header;
         }
 
         if (param.getType() == HttpSession.class) {

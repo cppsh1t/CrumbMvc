@@ -15,7 +15,7 @@ public class MainFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        log.info("get request: {}", req);
+//        log.info("get request: {}", req);
         chain.doFilter(req, res);
     }
 }
