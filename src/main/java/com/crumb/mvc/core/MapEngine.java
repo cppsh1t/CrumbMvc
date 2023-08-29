@@ -1,6 +1,6 @@
 package com.crumb.mvc.core;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.crumb.definition.BeanDefinition;
 import com.crumb.mvc.util.StringUtil;
 import com.crumb.util.ReflectUtil;
@@ -12,17 +12,22 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.http.HttpHeaders;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Slf4j
 public class MapEngine {
+
+    public static Function<Object, String> jsonCaster = JSON::toJSONString;
+
+    public static void setJsonCaster(Function<Object, String> caster) {
+        jsonCaster = caster;
+    }
 
     public static String getUrlRemainString(BeanDefinition def, String[] valueUnits) {
         var name = def.name;
@@ -127,8 +132,7 @@ public class MapEngine {
         }
 
         else {
-            //TODO: 这里的转换应该时可以转换的，待会加一个接口
-            var str = JSON.toJSONString(result);
+            var str = jsonCaster.apply(result);
             ServletUtil.writeResponse(response, str);
         }
     }

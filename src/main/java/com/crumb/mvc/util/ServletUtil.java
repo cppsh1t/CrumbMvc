@@ -33,8 +33,8 @@ public class ServletUtil {
     public static boolean testUrlString(String methodString, String urlRemainString, EnhancedUrl url) {
         if (methodString.equals(urlRemainString)) return true;
 
-        String[] methodUnits = Arrays.stream(methodString.split("/")).filter(s -> !s.isEmpty()).toArray(String[]::new);
-        String[] urlUnits = Arrays.stream(urlRemainString.split("/")).filter(s -> !s.isEmpty()).toArray(String[]::new);
+        String[] methodUnits = StringUtil.getUnits(methodString);
+        String[] urlUnits = StringUtil.getUnits(urlRemainString);
         if (methodUnits.length != urlUnits.length) return false;
 
         for (int i = 0; i < methodUnits.length; i++) {
