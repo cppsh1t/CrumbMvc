@@ -10,7 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.http.HttpHeaders;
@@ -113,7 +117,16 @@ public class MapEngine {
     private static void handleResult(Object result, HttpServletResponse response) {
         if (result instanceof String str) {
             ServletUtil.writeResponse(response, str);
-        } else {
+        } else if (result instanceof InputStream inputStream) {
+            try {
+                var outputStream = response.getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        else {
             //TODO: 这里的转换应该时可以转换的，待会加一个接口
             var str = JSON.toJSONString(result);
             ServletUtil.writeResponse(response, str);

@@ -15,7 +15,8 @@ public class MainFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-//        log.info("get request: {}", req);
+        var url = new EnhancedUrl(req);
+        log.info("get requestUrl: {}", url.getRequestUrl());
         chain.doFilter(req, res);
     }
 }
