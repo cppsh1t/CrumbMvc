@@ -55,10 +55,7 @@ public class ContainerServlet extends HttpServlet {
         String[] valueSlashUnits = originUrl.getValueUnitsWithSlash();
 
         var defs = container.getBeanDefinition(d -> this.testBean(d, valueSlashUnits));
-        if (defs.length == 0) {
-            resp.getWriter().write("404 not found");
-            return;
-        }
+        if (defs.length == 0) return;
 
         for(var def : defs) {
             var urlRemainString = MapEngine.getUrlRemainString(def, valueSlashUnits);

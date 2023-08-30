@@ -18,7 +18,6 @@ import java.util.*;
 @Slf4j
 public class MainFilter extends HttpFilter {
 
-
     private FreeBlock freeBlock;
 
     private final Set<FilterBlock> filterBlocks = new HashSet<>();
