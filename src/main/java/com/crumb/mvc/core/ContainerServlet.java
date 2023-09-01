@@ -29,33 +29,41 @@ public class ContainerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("receive get request which url: {}", req.getRequestURL());
         mappingRequest(req, resp, RequestType.GET);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("receive post request which url: {}", req.getRequestURL());
         mappingRequest(req, resp, RequestType.POST);
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("receive put request which url: {}", req.getRequestURL());
         mappingRequest(req, resp, RequestType.PUT);
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("receive delete request which url: {}", req.getRequestURL());
         mappingRequest(req, resp, RequestType.DELETE);
     }
 
-    private void mappingRequest(HttpServletRequest req, HttpServletResponse resp, RequestType requestType) throws IOException {
+    private void mappingRequest(HttpServletRequest req, HttpServletResponse resp, RequestType requestType) {
         var requestAnno = RequestType.getRequestAnno(requestType);
         resp.setCharacterEncoding("UTF-8");
         var originUrl = new EnhancedUrl(req);
         String[] valueSlashUnits = originUrl.getValueUnitsWithSlash();
 
         var defs = container.getBeanDefinition(d -> this.testBean(d, valueSlashUnits));
-        if (defs.length == 0) return;
+        if (defs.length == 0) {
+            log.debug("unable to find the corresponding controller");
+        } else {
+            log.debug("found the corresponding controller: {}", Arrays.toString(defs));
+        }
 
         for(var def : defs) {
             var urlRemainString = MapEngine.getUrlRemainString(def, valueSlashUnits);
@@ -70,9 +78,15 @@ public class ContainerServlet extends HttpServlet {
                                 && ServletUtil.testParamArray(urlParamKeys, methodParamKeys);
                     }).collect(Collectors.toList());
 
+            log.debug("found the handler function that matches the address mapping: {}", methods);
             for (var method : methods) {
                 boolean success = MapEngine.invokeMappingMethod(req, resp, method, bean, originUrl);
-                if (success) break;
+                if (success) {
+                    log.debug("function: {} process request successfully", method);
+                    break;
+                } else {
+                    log.debug("function: {} failed to process the request", method);
+                }
             }
 
         }

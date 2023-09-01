@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 
@@ -13,8 +14,9 @@ public class ServletUtil {
     private static final String regx = "\\{[a-zA-Z0-9]+\\}";
 
 
-    public static void writeResponse(HttpServletResponse response, String str) {
+    public static void writeResponse(HttpServletResponse response, String str, String produce) {
         try {
+            if(!produce.isEmpty()) response.setContentType(produce);
             response.getWriter().write(str);
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -48,5 +50,6 @@ public class ServletUtil {
         }
         return true;
     }
+
 
 }

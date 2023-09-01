@@ -43,10 +43,10 @@ public class MapEngine {
 
     public static boolean invokeMappingMethod(HttpServletRequest req, HttpServletResponse resp,
                                            Method method, Object target, EnhancedUrl url) {
+        var produce = RequestType.getRequestAnnoProduce(method);
         if (method.getParameterCount() == 0) {
             var result = ReflectUtil.invokeMethod(method, target);
-            handleResult(result, resp);
-            return true;
+            handleResult(result, resp, produce);
         }
 
         else {
@@ -55,9 +55,9 @@ public class MapEngine {
             boolean hasNull = Arrays.stream(paramArr).anyMatch(Objects::isNull);
             if (hasNull) return false;
             var result = ReflectUtil.invokeMethod(method, target, paramArr);
-            handleResult(result, resp);
-            return true;
+            handleResult(result, resp, produce);
         }
+        return true;
 
 
     }
@@ -119,11 +119,12 @@ public class MapEngine {
         return null;
     }
 
-    private static void handleResult(Object result, HttpServletResponse response) {
+    private static void handleResult(Object result, HttpServletResponse response, String produce) {
         if (result instanceof String str) {
-            ServletUtil.writeResponse(response, str);
+            ServletUtil.writeResponse(response, str, produce);
         } else if (result instanceof InputStream inputStream) {
             try {
+                if (!produce.isEmpty()) response.setContentType(produce);
                 var outputStream = response.getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
             } catch (IOException exception) {
@@ -133,7 +134,7 @@ public class MapEngine {
 
         else {
             var str = jsonCaster.apply(result);
-            ServletUtil.writeResponse(response, str);
+            ServletUtil.writeResponse(response, str, produce);
         }
     }
 

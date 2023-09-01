@@ -59,4 +59,24 @@ public enum RequestType {
         return value != null ? value : method.getAnnotation(RequestMapping.class).value();
     }
 
+    public static String getRequestAnnoProduce(Method method) {
+        String produce = null;
+
+        if (method.isAnnotationPresent(GetMapping.class)) {
+            var anno = method.getAnnotation(GetMapping.class);
+            if (anno != null) produce = anno.produces();
+        } else if (method.isAnnotationPresent(PostMapping.class)) {
+            var anno = method.getAnnotation(PostMapping.class);
+            if (anno != null) produce = anno.produces();
+        } else if (method.isAnnotationPresent(DeleteMapping.class)) {
+            var anno = method.getAnnotation(DeleteMapping.class);
+            if (anno != null) produce = anno.produces();
+        } else if (method.isAnnotationPresent(PutMapping.class)){
+            var anno = method.getAnnotation(PutMapping.class);
+            if (anno != null) produce = anno.produces();
+        }
+
+        return produce != null ? produce : method.getAnnotation(RequestMapping.class).produces();
+    }
+
 }
