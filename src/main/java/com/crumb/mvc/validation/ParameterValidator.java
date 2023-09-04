@@ -1,10 +1,19 @@
 package com.crumb.mvc.validation;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 
-public interface ParameterValidator {
+public abstract class ParameterValidator {
 
-    boolean validate(Parameter param, Object value);
+
+    abstract Class<? extends Annotation> getTargetAnnoClass();
+
+    abstract boolean doValidate(Parameter param, Object value);
+
+    public final boolean validate(Parameter param, Object value) {
+        if (!param.isAnnotationPresent(getTargetAnnoClass())) return true;
+        return doValidate(param, value);
+    }
 
 }

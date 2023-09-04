@@ -9,7 +9,9 @@ public class ParameterValidateManager {
     private static final List<ParameterValidator> validators = new ArrayList<>();
 
     static {
-        validators.add(new ParamLengthValidator());
+        validators.add(new LengthValidator());
+        validators.add(new AssertTrueValidator());
+        validators.add(new AssertFalseValidator());
     }
 
     public static boolean validateParameter(Parameter param, Object value) {

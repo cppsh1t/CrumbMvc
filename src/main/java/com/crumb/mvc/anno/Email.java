@@ -7,8 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Length {
+public @interface Email {
 
-    int min();
-    int max();
 }
