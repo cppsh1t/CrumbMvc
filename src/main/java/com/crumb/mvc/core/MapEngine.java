@@ -3,6 +3,7 @@ package com.crumb.mvc.core;
 import com.alibaba.fastjson2.JSON;
 import com.crumb.definition.BeanDefinition;
 import com.crumb.mvc.util.StringUtil;
+import com.crumb.mvc.validation.ParameterValidateManager;
 import com.crumb.util.ReflectUtil;
 import com.crumb.web.*;
 import com.crumb.mvc.util.ServletUtil;
@@ -63,60 +64,63 @@ public class MapEngine {
     }
 
     private static Object injectParam(Parameter param, HttpServletRequest req, HttpServletResponse resp, EnhancedUrl url) {
+        Object value = null;
+
         if (param.isAnnotationPresent(RequestParam.class)) {
             var anno = param.getAnnotation(RequestParam.class);
             var name = anno.value();
             var paramMap = url.getParamMap();
-            var value = paramMap.get(name);
+            value = paramMap.get(name);
             if (value == null && !anno.required()) value = anno.defaultValue();
-            return value;
         }
 
-        if (param.isAnnotationPresent(CookieValue.class)) {
+        else if (param.isAnnotationPresent(CookieValue.class)) {
             var anno = param.getAnnotation(CookieValue.class);
             var name = anno.value();
             if (req.getCookies() == null) {
-                return anno.required() ? null : anno.defaultValue();
-            }
-
-            var cookie = Arrays.stream(req.getCookies())
-                    .filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-            if (cookie == null) {
-                return anno.required() ? null : anno.defaultValue();
+                value = anno.required() ? null : anno.defaultValue();
             } else {
-                return cookie.getValue();
+                var cookie = Arrays.stream(req.getCookies())
+                        .filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+                if (cookie == null) {
+                    value = anno.required() ? null : anno.defaultValue();
+                } else {
+                    value = cookie.getValue();
+                }
             }
+
         }
 
-        if (param.isAnnotationPresent(SessionAttribute.class)) {
+        else if (param.isAnnotationPresent(SessionAttribute.class)) {
             var name = param.getAnnotation(SessionAttribute.class).value();
-            return req.getSession().getAttribute(name);
+            value = req.getSession().getAttribute(name);
         }
 
-        if (param.isAnnotationPresent(PathVariable.class)) {
+        else if (param.isAnnotationPresent(PathVariable.class)) {
             var name = param.getAnnotation(PathVariable.class).value();
             var pathMap = url.getPathVarMap();
-            return pathMap.get(name);
+            value = pathMap.get(name);
         }
 
-        if (param.isAnnotationPresent(RequestHeader.class)) {
+        else if (param.isAnnotationPresent(RequestHeader.class)) {
             var name = param.getAnnotation(RequestHeader.class).value();
-            return req.getHeader(name);
+            value = req.getHeader(name);
         }
 
-        if (param.getType() == HttpSession.class) {
-            return  req.getSession();
+        else if (param.getType() == HttpSession.class) {
+            value = req.getSession();
         }
 
-        if (param.getType() == HttpServletRequest.class) {
-            return req;
+        else if (param.getType() == HttpServletRequest.class) {
+            value = req;
         }
 
-        if (param.getType() == HttpServletResponse.class) {
-            return resp;
+        else if (param.getType() == HttpServletResponse.class) {
+            value = resp;
         }
 
-        return null;
+        boolean legal = ParameterValidateManager.validateParameter(param, value);
+        return legal ? value : null;
     }
 
     private static void handleResult(Object result, HttpServletResponse response, String produce) {
