@@ -12,6 +12,10 @@ public class ParameterValidateManager {
         validators.add(new LengthValidator());
         validators.add(new AssertTrueValidator());
         validators.add(new AssertFalseValidator());
+        validators.add(new EmailValidator());
+        validators.add(new PatternValidator());
+        validators.add(new NotBlankValidator());
+        validators.add(new MinValidator());
     }
 
     public static boolean validateParameter(Parameter param, Object value) {

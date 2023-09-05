@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Function;
@@ -119,6 +120,10 @@ public class MapEngine {
             value = resp;
         }
 
+        if (value != null) {
+            value = castString(param, value);
+        }
+
         boolean legal = ParameterValidateManager.validateParameter(param, value);
         return legal ? value : null;
     }
@@ -140,6 +145,31 @@ public class MapEngine {
             var str = jsonCaster.apply(result);
             ServletUtil.writeResponse(response, str, produce);
         }
+    }
+
+    private static Object castString(Parameter param, Object obj) {
+        String str = (String) obj;
+
+        if (param.getType() == int.class || param.getType() == Integer.class) {
+            return Integer.parseInt(str);
+        }
+
+        if (param.getType() == long.class || param.getType() == Long.class) {
+            return Long.parseLong(str);
+        }
+
+        if (param.getType() == float.class || param.getType() == Float.class) {
+            return Float.parseFloat(str);
+        }
+
+        if (param.getType() == double.class || param.getType() == Double.class) {
+            return Double.parseDouble(str);
+        }
+
+        if (param.getType() == boolean.class || param.getType() == Boolean.class) {
+            return Boolean.parseBoolean(str);
+        }
+        return obj;
     }
 
 }

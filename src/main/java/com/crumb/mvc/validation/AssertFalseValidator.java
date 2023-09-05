@@ -14,6 +14,10 @@ public class AssertFalseValidator extends ParameterValidator{
 
     @Override
     boolean doValidate(Parameter param, Object value) {
+        if (value instanceof Boolean bValue) {
+            return !bValue;
+        }
+
         boolean castValue = Boolean.parseBoolean(value.toString());
         return !castValue;
     }

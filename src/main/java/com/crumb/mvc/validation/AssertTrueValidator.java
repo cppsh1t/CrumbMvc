@@ -15,6 +15,10 @@ public class AssertTrueValidator extends ParameterValidator {
 
     @Override
     boolean doValidate(Parameter param, Object value) {
+        if (value instanceof Boolean bValue) {
+            return bValue;
+        }
+
         return Boolean.parseBoolean(value.toString());
     }
 }
