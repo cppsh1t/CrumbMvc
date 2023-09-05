@@ -1,6 +1,7 @@
 package com.crumb.mvc.core;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.crumb.definition.BeanDefinition;
 import com.crumb.mvc.util.StringUtil;
 import com.crumb.mvc.validation.ParameterValidateManager;
@@ -25,10 +26,19 @@ import java.util.function.Function;
 @Slf4j
 public class MapEngine {
 
-    public static Function<Object, String> jsonCaster = JSON::toJSONString;
+    private static Function<Object, String> jsonCaster = JSON::toJSONString;
+    private static Function<String, String> stringCaster = str -> {
+      var json = new JSONObject();
+      json.put("msg", str);
+      return json.toString();
+    };
 
     public static void setJsonCaster(Function<Object, String> caster) {
         jsonCaster = caster;
+    }
+
+    public static void setStringCaster(Function<String, String> caster) {
+        stringCaster = caster;
     }
 
     public static String getUrlRemainString(BeanDefinition def, String[] valueUnits) {
@@ -130,7 +140,8 @@ public class MapEngine {
 
     private static void handleResult(Object result, HttpServletResponse response, String produce) {
         if (result instanceof String str) {
-            ServletUtil.writeResponse(response, str, produce);
+            var jsonStr = stringCaster.apply(str);
+            ServletUtil.writeResponse(response, jsonStr, produce);
         } else if (result instanceof InputStream inputStream) {
             try {
                 if (!produce.isEmpty()) response.setContentType(produce);
