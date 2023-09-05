@@ -16,6 +16,9 @@ public class ParameterValidateManager {
         validators.add(new PatternValidator());
         validators.add(new NotBlankValidator());
         validators.add(new MinValidator());
+        validators.add(new MaxValidator());
+        validators.add(new NotEmptyValidator());
+        validators.add(new RangeValidator());
     }
 
     public static boolean validateParameter(Parameter param, Object value) {

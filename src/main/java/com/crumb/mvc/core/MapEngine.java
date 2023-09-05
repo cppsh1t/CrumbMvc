@@ -166,6 +166,10 @@ public class MapEngine {
             return Double.parseDouble(str);
         }
 
+        if (param.getType() == short.class || param.getType() == Short.class) {
+            return Short.parseShort(str);
+        }
+
         if (param.getType() == boolean.class || param.getType() == Boolean.class) {
             return Boolean.parseBoolean(str);
         }
